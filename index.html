@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pilates Booking</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 {
+      color: #444;
+    }
+    .form-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin: auto;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button {
+      background: #28a745;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #218838;
+    }
+    .message {
+      margin-top: 20px;
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pilates Class Booking</h1>
+  <div class="form-container">
+    <form id="bookingForm">
+      <input type="text" id="name" placeholder="Your Name" required>
+      <select id="slot" required>
+        <option value="">-- Select a Time --</option>
+        <option value="Monday 18:00">Monday 18:00</option>
+        <option value="Monday 19:00">Monday 19:00</option>
+      </select>
+      <button type="submit">Confirm Booking</button>
+    </form>
+    <div id="message" class="message"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('bookingForm');
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const slot = document.getElementById('slot').value;
+
+      fetch("https://script.google.com/macros/s/AKfycbxOOWFiDDiqbeDkjPogoWZx4ItJ0UrpfBj_LRPVVhg3bPORuejjfXZ_f0WrYvgkm7G9/exec", {
+        method: "POST",
+        body: JSON.stringify({ name, slot })
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('message').textContent = "✅ Booking confirmed!";
+        form.reset();
+      })
+      .catch(error => {
+        document.getElementById('message').textContent = "❌ Error. Please try again.";
+      });
+    });
+  </script>
+</body>
+</html>
