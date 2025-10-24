@@ -25,11 +25,17 @@
     }
     input, select, button {
       width: 100%;
+      max-width: 100%;        /* ✅ prevent overflow */
+      box-sizing: border-box; /* ✅ include padding in width calc */
       padding: 14px;
       margin: 10px 0;
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 16px;
+    }
+    input::placeholder {
+      font-size: 15px;
+      text-overflow: ellipsis; /* ✅ truncate if too long */
     }
     button {
       background: #28a745;
@@ -123,7 +129,7 @@
       const name = document.getElementById('name').value;
       const slot = document.getElementById('slot').value;
 
-      fetch("YOUR_WEB_APP_URL_HERE", {
+      fetch("https://script.google.com/macros/s/AKfycbxOOWFiDDiqbeDkjPogoWZx4ItJ0UrpfBj_LRPVVhg3bPORuejjfXZ_f0WrYvgkm7G9/exec", {
         method: "POST",
         body: JSON.stringify({ name, slot })
       })
