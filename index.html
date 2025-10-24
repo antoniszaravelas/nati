@@ -66,32 +66,53 @@
   </div>
 
   <script>
-    // ---------- Generate Monday options ----------
-    function getMondays(startDate, monthsAhead) {
-      let mondays = [];
-      let date = new Date(startDate);
-      date.setDate(date.getDate() + ((1 - date.getDay() + 7) % 7)); // move to next Monday
-      const end = new Date(startDate);
-      end.setMonth(end.getMonth() + monthsAhead, 0); // end of period
+    function getNextMonday(fromDate = new Date()) {
+      const date = new Date(fromDate);
+      const day = date.getDay();
+      const diff = (day === 1 ? 0 : (8 - day) % 7);
+      date.setDate(date.getDate() + diff);
+      return date;
+    }
 
-      while (date <= end) {
-        mondays.push(new Date(date));
-        date.setDate(date.getDate() + 7); // next Monday
+    function getMondaysInMonth(year, month, startDate = null) {
+      let mondays = [];
+      const date = new Date(year, month, 1);
+      // find first Monday
+      while (date.getDay() !== 1) {
+        date.setDate(date.getDate() + 1);
+      }
+      while (date.getMonth() === month) {
+        if (!startDate || date >= startDate) {
+          mondays.push(new Date(date));
+        }
+        date.setDate(date.getDate() + 7);
       }
       return mondays;
     }
 
     function populateOptions() {
       const today = new Date();
-      let monthsAhead = 1; // show current + next
-      if (today.getMonth() === 10) { // November (month=10)
-        monthsAhead = 1; // Nov + Dec
-      } else if (today.getMonth() === 11) { // December
-        monthsAhead = 1; // Dec + Jan
-      }
-      const mondays = getMondays(today, monthsAhead);
-
       const slotSelect = document.getElementById("slot");
+
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+
+      const nextMonday = getNextMonday(today);
+
+      let mondays = [];
+
+      if (currentMonth === 10) { // November
+        mondays = getMondaysInMonth(currentYear, currentMonth, nextMonday)
+                .concat(getMondaysInMonth(currentYear, currentMonth + 1));
+      } else if (currentMonth === 11) { // December
+        mondays = getMondaysInMonth(currentYear, currentMonth, nextMonday)
+                .concat(getMondaysInMonth(currentYear + 1, 0)); // January
+      } else {
+        // General case: show rest of current month + next month
+        mondays = getMondaysInMonth(currentYear, currentMonth, nextMonday)
+                .concat(getMondaysInMonth(currentYear, currentMonth + 1));
+      }
+
       mondays.forEach(monday => {
         const dateStr = monday.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
         ["18:00", "19:00"].forEach(time => {
@@ -105,7 +126,7 @@
 
     populateOptions();
 
-    // ---------- Handle form ----------
+    // Handle form
     const form = document.getElementById('bookingForm');
     form.addEventListener('submit', function(e) {
       e.preventDefault();
